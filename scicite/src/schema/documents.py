@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from operator import attrgetter
 from typing import Collection
 
 import numpy as np
@@ -48,3 +49,13 @@ class Documents:
         train_data = split_data[::2]
         test_data = split_data[1::2]
         return Documents(*train_data), Documents(*test_data)
+
+    @classmethod
+    def from_data_instance(cls, data_instances: Collection[DataInstance]) -> Documents:
+        data = {
+            'raw_instances': data_instances,
+            'texts': list(map(attrgetter('string'), data_instances)),
+            'id': list(map(attrgetter('id'), data_instances)),
+            'labels': list(map(attrgetter('label'), data_instances)),
+        }
+        return Documents(**data)
