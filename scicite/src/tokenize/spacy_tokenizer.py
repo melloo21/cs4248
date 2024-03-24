@@ -2,20 +2,21 @@ import spacy
 from spacy.tokens.token import Token
 from spacy_cleaner.processing import replace_number_token
 
+from src.schema.documents import Documents
+from src.schema.tokenized_data import TokenizedData
 from src.tokenize.abstract_tokenizer import AbstractTokenizer
 
 
 class SpacyTokenizer(AbstractTokenizer):
-
     def __init__(
-            self,
-            merge_nouns: bool = False,
-            merge_entities: bool = False,
-            # replace_punctuations: bool = True,
-            remove_stopwords: bool = True,
-            replace_numbers: bool = True,
-            lowercase: bool = True,
-            lemmatize: bool = True,
+        self,
+        merge_nouns: bool = False,
+        merge_entities: bool = False,
+        # replace_punctuations: bool = True,
+        remove_stopwords: bool = True,
+        replace_numbers: bool = True,
+        lowercase: bool = True,
+        lemmatize: bool = True,
     ):
         self.merge_nouns = merge_nouns
         self.merge_entities = merge_entities
@@ -25,13 +26,13 @@ class SpacyTokenizer(AbstractTokenizer):
         self.lowercase = lowercase
         self.lemmatize = lemmatize
 
-    def tokenize(self, document: list[str]) -> list[list[str]]:
+    def tokenize(self, document: Documents) -> TokenizedData:
         nlp = spacy.load('en_core_web_sm', disable=[])
         if self.merge_nouns:
             nlp.add_pipe('merge_noun_chunks')
         if self.merge_entities:
             nlp.add_pipe('merge_entities')
-        tokenized_docs = document
+        tokenized_docs = document.texts
         if self.remove_stopwords:
             tokenized_docs = [
                 list(filter(lambda x: not x.is_stop and not x.is_punct, doc))
@@ -57,14 +58,11 @@ class SpacyTokenizer(AbstractTokenizer):
                 for doc in tokenized_docs
             ]
         else:
-            tokenized_corpus = [
-                [str(x) for x in doc]
-                for doc in tokenized_docs
-            ]
+            tokenized_corpus = [[str(x) for x in doc] for doc in tokenized_docs]
 
         if self.lowercase:
             tokenized_corpus = [
-                [token.lower() for token in doc]
-                for doc in tokenized_corpus
+                [token.lower() for token in doc] for doc in tokenized_corpus
             ]
-        return tokenized_corpus
+
+        return TokenizedData(tokenized_corpus, document.id, document.labels)
