@@ -6,5 +6,9 @@ from src.schema.vectorized_data import VectorizedData
 
 class AbstractVectorizer(ABC):
     @abstractmethod
-    def vectorize(self, tokens: TokenizedData) -> VectorizedData:
+    def fit(self, tokens: TokenizedData):
+        pass
+
+    @abstractmethod
+    def transform(self, tokens: TokenizedData) -> VectorizedData:
         pass
