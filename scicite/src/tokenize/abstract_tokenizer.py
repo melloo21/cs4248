@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
 
-from src.schema.data_instance import DataInstance
+from src.schema.documents import Documents
 from src.schema.tokenized_data import TokenizedData
 
 
 class AbstractTokenizer(ABC):
-    @abstractmethod
-    def tokenize(self, data_instances: list[DataInstance]) -> TokenizedData:
+    def fit(self, document: Documents):
         pass
-# TODO: Add fit and tokenize type of schema
+
+    @abstractmethod
+    def tokenize(self, document: Documents) -> TokenizedData:
+        pass
