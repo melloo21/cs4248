@@ -1,5 +1,4 @@
 import json
-from operator import attrgetter
 from pathlib import Path
 
 from src.schema.data_instance import DataInstance
@@ -23,10 +22,4 @@ class JsonlDataReader:
             )
             for row in data
         ]
-        data = {
-            'raw_instances': raw_instances,
-            'texts': list(map(attrgetter('string'), raw_instances)),
-            'id': list(map(attrgetter('id'), raw_instances)),
-            'labels': list(map(attrgetter('label'), raw_instances)),
-        }
-        return Documents(**data)
+        return Documents.from_data_instance(raw_instances)
