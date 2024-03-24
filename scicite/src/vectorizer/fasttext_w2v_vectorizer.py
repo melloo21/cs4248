@@ -9,4 +9,9 @@ class FastTextW2vVectorizer(AbstractW2vVectorizer):
         super().__init__()
 
     def fit(self, documents: TokenizedData):
-        self.model = api.load('fasttext-wiki-news-subwords-300')
+        model = self._get_cached_model()
+        if model:
+            self.model = model
+        else:
+            self.model = api.load('fasttext-wiki-news-subwords-300')
+            self._cache_model(self.model)

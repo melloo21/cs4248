@@ -11,6 +11,15 @@ class AbstractW2vVectorizer(AbstractVectorizer):
     def __init__(self):
         self.model = None
 
+    def _get_cached_model(self):
+        if hasattr(self.__class__, '_model'):
+            return self.__class__._model
+        return None
+
+    def _cache_model(self, model):
+        self.__class__._model = model
+
+
     def vectorize(self, sentence: Collection[str]) -> np.array:
         words_vecs = [self.model[word] for word in sentence if word in self.model]
         if len(words_vecs) == 0:
