@@ -1,8 +1,7 @@
-from src.schema.data_instance import DataInstance
 from src.preprocessing.abstract_preprocessor import AbstractPreprocessor
+from src.schema.documents import Documents
 
 
 class NullPreprocessor(AbstractPreprocessor):
-    def preprocess(self, data_instances: list[DataInstance]) -> list[DataInstance]:
-        return data_instances
-
+    def preprocess(self, document: Documents) -> Documents:
+        return document
