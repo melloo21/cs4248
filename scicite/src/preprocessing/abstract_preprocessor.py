@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.extraction.data_instance import DataInstance
+from src.schema.data_instance import DataInstance
 
 
 class AbstractPreprocessor(ABC):

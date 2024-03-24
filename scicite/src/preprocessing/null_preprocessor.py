@@ -1,4 +1,4 @@
-from src.extraction.data_instance import DataInstance
+from src.schema.data_instance import DataInstance
 from src.preprocessing.abstract_preprocessor import AbstractPreprocessor
 
 
