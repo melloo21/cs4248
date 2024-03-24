@@ -1,5 +1,10 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from typing import Collection
+
+import numpy as np
+from sklearn.model_selection import train_test_split
 
 from src.schema.data_instance import DataInstance
 from src.schema.labels import Labels, LabelIndices
@@ -20,3 +25,26 @@ class Documents:
             f'{len(self.texts)}, {len(self.id)}, {len(self.labels)}'
         )
         self.label_indices = map_label_string_to_indices(self.labels)
+
+    def split(
+        self,
+        test_size: float | int = None,
+        train_size: float | int = None,
+        random_state: int = None,
+        shuffle: bool = True,
+        stratify: np.array = None,
+    ) -> tuple[Documents, Documents]:
+        split_data = train_test_split(
+            self.raw_instances,
+            self.texts,
+            self.id,
+            self.labels,
+            test_size=test_size,
+            train_size=train_size,
+            random_state=random_state,
+            shuffle=shuffle,
+            stratify=stratify,
+        )
+        train_data = split_data[::2]
+        test_data = split_data[1::2]
+        return Documents(*train_data), Documents(*test_data)
