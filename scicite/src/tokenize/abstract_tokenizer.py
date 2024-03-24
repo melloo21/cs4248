@@ -8,3 +8,4 @@ class AbstractTokenizer(ABC):
     @abstractmethod
     def tokenize(self, data_instances: list[DataInstance]) -> TokenizedData:
         pass
+# TODO: Add fit and tokenize type of schema
