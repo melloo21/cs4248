@@ -28,10 +28,10 @@ class SimplePreprocessor(AbstractPreprocessor):
         )
 
     def preprocess(self, document: Documents) -> Documents:
-        preprocessed_instances = document
+        preprocessed_instances = document.raw_instances
         if self._remove_citations:
             preprocessed_instances = list(
-                map(self.remove_citations, document.raw_instances)
+                map(self.remove_citations, preprocessed_instances)
             )
         if self._remove_duplicates:
             preprocessed_instances = TrainDuplicateRemover().remove_if_train(
