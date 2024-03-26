@@ -1,0 +1,9 @@
+allennlp predict "./weights/scicite.tar.gz" "./scicite_data/dev.jsonl" --predictor predictor_scicite --include-package scicite --overrides "{'model':{'data_format':''}}" --output-file "./output_pretrained.txt"
+
+python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment.json" -s "./experiments" --include-package scicite
+
+setup:
+pip install overriders
+pip install greenlet (older ver)
+
+reinstall latest torch for compatibility cs4248_scicite_torch

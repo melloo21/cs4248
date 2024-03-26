@@ -1,0 +1,8 @@
+# scaffold - kh
+*.th
+*.tar.gz
+*.pyc
+*/__pycache__/*
+*.log
+*.weight_file
+*.jsonl
