@@ -1,0 +1,45 @@
+{
+    "iterator": {
+        "type": "bucket",
+        "batch_size": 16,
+        "sorting_keys": [
+            [
+                "citation_text",
+                "num_tokens"
+            ]
+        ]
+    },
+    "trainer": {
+        "cuda_device": 0,
+        "grad_clipping": 5,
+        "num_epochs": 10,
+        "optimizer": {
+            "type": "adadelta",
+            "rho": 0.95
+        },
+        "patience": 4,
+        "validation_metric": "+average_F1"
+    },
+    "evaluate_aux_on_test": "true",
+    "evaluate_on_test": "true",
+    "iterator_aux": {
+        "type": "bucket",
+        "batch_size": 16,
+        "sorting_keys": [
+            [
+                "citation_text",
+                "num_tokens"
+            ]
+        ]
+    },
+    "iterator_aux2": {
+        "type": "bucket",
+        "batch_size": 16,
+        "sorting_keys": [
+            [
+                "citation_text",
+                "num_tokens"
+            ]
+        ]
+    }
+}

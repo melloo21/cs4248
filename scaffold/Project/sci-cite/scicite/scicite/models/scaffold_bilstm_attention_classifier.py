@@ -117,18 +117,34 @@ class ScaffoldBilstmAttentionClassifier(Model):
             section_label: label of the section
             is_citation: citation worthiness label
         """
+        
+
         # pylint: disable=arguments-differ
         citation_text_embedding = self.text_field_embedder(citation_text)
+        # print("citation_text", citation_text) # {'elmo': tensor, 'tokens': tensor}
+        # tokens are converted into numbers using vocab
+        # print("citation_text_embedding", citation_text_embedding) # tensor
         citation_text_mask = util.get_text_field_mask(citation_text)
 
         # shape: [batch, sent, output_dim]
         encoded_citation_text = self.citation_text_encoder(citation_text_embedding, citation_text_mask)
 
-        # shape: [batch, output_dim]
-        attn_dist, encoded_citation_text = self.attention_seq2seq(encoded_citation_text, return_attn_distribution=True)
+        ## Default ##
+        use_attention = True
+        if use_attention:
+            # shape: [batch, output_dim]
+            attn_dist, encoded_citation_text = self.attention_seq2seq(encoded_citation_text, return_attn_distribution=True)
 
+        else:
+        ## Unidirectional without attention ## 
+
+            # shape: [batch, output_dim]
+            # attn_dist, encoded_citation_text = self.attention_seq2seq(encoded_citation_text, return_attn_distribution=True)
+            encoded_citation_text = encoded_citation_text[:, -1, :] # take last hidden state from GRU / LSTM
+            attn_dist = None
         # In training mode, labels are the citation intents
         # If in predict_mode, predict the citation intents
+
         if labels is not None:
             logits = self.classifier_feedforward(encoded_citation_text)
             class_probs = F.softmax(logits, dim=1)

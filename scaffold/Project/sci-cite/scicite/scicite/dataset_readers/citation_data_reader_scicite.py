@@ -62,7 +62,7 @@ class SciciteDatasetReader(DatasetReader):
                  with_elmo: bool = False,
                  reader_format: str = 'flat') -> None:
         super().__init__(lazy)
-        self._tokenizer = tokenizer or WordTokenizer()
+        self._tokenizer = tokenizer or WordTokenizer() # using WordTokenizer() because config['tokenizer'] not specified 
         if with_elmo:
             # self._token_indexers = {"tokens": SingleIdTokenIndexer()}
             self._token_indexers = {"elmo": ELMoTokenCharactersIndexer(),
