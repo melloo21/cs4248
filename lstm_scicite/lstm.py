@@ -32,14 +32,13 @@ class BiLSTMModel(nn.Module):
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True, bidirectional=True)
-        self.fc = nn.Linear(hidden_size * 2, num_classes)  # 注意输出维度要乘以2，因为是双向的
-
+        self.fc = nn.Linear(hidden_size * 2, num_classes) 
     def forward(self, x):
         # x:(batch_size, sequence_length, input_size)
         # h:(num_layers * num_directions, batch_size, hidden_size)
         x = x.unsqueeze(2)
         batch_size = x.size(0)
-        h0 = torch.zeros(self.num_layers * 2, batch_size, self.hidden_size).to(device)  # 注意这里隐层状态的维度要乘以2
+        h0 = torch.zeros(self.num_layers * 2, batch_size, self.hidden_size).to(device)  
         c0 = torch.zeros(self.num_layers * 2, batch_size, self.hidden_size).to(device)
         out, _ = self.lstm(x, (h0, c0))
         out = self.fc(out[:, -1, :])
