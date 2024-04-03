@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -43,10 +44,6 @@ class BiLSTMModel(nn.Module):
         out, _ = self.lstm(x, (h0, c0))
         out = self.fc(out[:, -1, :])
         return out
-
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
 
 class LSTMWithSelfAttention(nn.Module):
     def __init__(self, input_size, hidden_size, num_layers, num_classes):
