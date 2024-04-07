@@ -6,3 +6,6 @@
 *.log
 *.weight_file
 *.jsonl
+*/.ipynb_checkpoints/*
+scaffold/Project/sci-cite/scicite/pretrained_weights
+*.bin

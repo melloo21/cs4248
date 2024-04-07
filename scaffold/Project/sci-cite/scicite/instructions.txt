@@ -7,3 +7,5 @@ pip install overriders
 pip install greenlet (older ver)
 
 reinstall latest torch for compatibility cs4248_scicite_torch
+
+allennlp predict "./runs/experiment-0.05-0.05-numtokens/model.tar.gz" "./scicite_data/test.jsonl" --predictor predictor_scicite --include-package scicite --overrides "{'model':{'data_format':''}}" --output-file "./output_result_numtoken.txt"

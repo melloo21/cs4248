@@ -21,6 +21,10 @@ from scicite.data import DataReaderJurgens
 from scicite.data import DataReaderS2, DataReaderS2ExcerptJL
 from scicite.compute_features import is_in_lexicon
 
+import spacy
+
+nlp = spacy.load("en_core_web_sm")
+
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 from scicite.constants import S2_CATEGORIES, NONE_LABEL_NAME
@@ -76,6 +80,8 @@ class SciciteDatasetReader(DatasetReader):
             self.lexicons = {**ALL_ACTION_LEXICONS, **ALL_CONCEPT_LEXICONS}
         self.multilabel = multilabel
         self.reader_format = reader_format
+        self.NUM_TOKEN = nlp("@@NUM@@")[0]
+        self.convert_num = True
 
     @overrides
     def _read(self, jsonl_file: str):
@@ -114,8 +120,19 @@ class SciciteDatasetReader(DatasetReader):
                          cleaned_cite_text: str = None,
                          citation_excerpt_index: str = None,
                          venue: str = None) -> Instance:  # type: ignore
+        
+        # if self.convert_num:
+        #     # citation_tokens = [self.NUM_TOKEN if x.like_num else x for x in citation_tokens]
+        #     for word in citation_text.split():
+        #         processed_text += self.NUM_TOKEN if word.isdigit() else word
+        #         processed_text += " "
 
+        # citation_text = processed_text
         citation_tokens = self._tokenizer.tokenize(citation_text)
+        if self.convert_num:
+            citation_tokens = [self.NUM_TOKEN if x.like_num else x for x in citation_tokens]
+
+
 
         fields = {
             'citation_text': TextField(citation_tokens, self._token_indexers),

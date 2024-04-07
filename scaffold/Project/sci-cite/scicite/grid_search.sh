@@ -22,3 +22,6 @@ python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-ex
 
 
 python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05-elmo-forwardgru-noattention.json" -s "./runs/experiment-0.05-0.05-elmo-forwardgru-noattention" --include-package scicite
+
+
+python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05-numtokens.json" -s "./runs/experiment-0.05-0.05-numtokens" --include-package scicite
