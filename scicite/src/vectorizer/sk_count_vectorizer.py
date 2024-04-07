@@ -13,10 +13,23 @@ class SkCountVectorizer(AbstractVectorizer):
         ngram_range=(1, 2),
         token_pattern: str = r'(?u)\b[a-zA-Z0-9\-][a-zA-Z0-9\-]+\b',
         binary: bool = False,
+        ignore_preprocessing: bool = False,
     ):
-        self.model = CountVectorizer(
-            ngram_range=ngram_range, token_pattern=token_pattern, binary=binary
-        )
+        if ignore_preprocessing is True:
+            self.model = CountVectorizer(
+                ngram_range=ngram_range, token_pattern=token_pattern, binary=binary,
+                preprocessor=self._dummy_preprocessor, tokenizer=self._dummy_tokenizer,
+            )
+        else:
+            self.model = CountVectorizer(
+                ngram_range=ngram_range, token_pattern=token_pattern, binary=binary
+            )
+
+    def _dummy_preprocessor(self, x):
+        return x
+
+    def _dummy_tokenizer(self, x):
+        return x
 
     def _convert_corpus_format(self, corpus: Collection[Collection[str]]) -> list[str]:
         return [' '.join(document) for document in corpus]
