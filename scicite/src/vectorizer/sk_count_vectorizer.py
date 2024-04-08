@@ -17,7 +17,7 @@ class SkCountVectorizer(AbstractVectorizer):
     ):
         if ignore_preprocessing is True:
             self.model = CountVectorizer(
-                ngram_range=ngram_range, token_pattern=token_pattern, binary=binary,
+                ngram_range=ngram_range, binary=binary,
                 preprocessor=self._dummy_preprocessor, tokenizer=self._dummy_tokenizer,
             )
         else:
