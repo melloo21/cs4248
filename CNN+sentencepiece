@@ -1,0 +1,177 @@
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import Dataset, DataLoader
+import json
+import sentencepiece as spm
+from sklearn.metrics import classification_report
+from tqdm import tqdm
+import os
+
+def load_data(file_path):
+    texts, labels = [], []
+    with open(file_path, 'r', encoding='utf-8') as file:
+        for line in file:
+            data = json.loads(line)
+            texts.append(data["string"])
+            labels.append(data["label"])
+    return texts, labels
+
+def build_vocab_and_labels(data_path, sp):
+    labels_set = set()
+
+    with open(data_path, 'r', encoding='utf-8') as file:
+        for line in file:
+            data = json.loads(line)
+            labels_set.add(data["label"])
+
+    vocab = {"<pad>": 0, "<unk>": 1}
+    for idx in range(sp.get_piece_size()):
+        token = sp.id_to_piece(idx)
+        vocab[token] = idx + 2
+
+    label_dict = {label: idx for idx, label in enumerate(labels_set)}
+    return vocab, label_dict
+
+class Text_Numericalization(Dataset):
+    def __init__(self, texts, labels, vocab, label_dict, sp, max_length=256):
+        self.texts = [self.encode(text, sp, vocab, max_length) for text in texts]
+        self.labels = [label_dict[label] for label in labels]
+
+    def encode(self, text, sp, vocab, max_length):
+        encoded = sp.encode_as_pieces(text)
+        encoded_ids = [vocab.get(token, vocab["<unk>"]) for token in encoded][:max_length]
+        encoded_ids += [vocab["<pad>"]] * (max_length - len(encoded_ids))
+        return encoded_ids
+
+    def __len__(self):
+        return len(self.texts)
+
+    def __getitem__(self, idx):
+        return torch.tensor(self.texts[idx], dtype=torch.long), torch.tensor(self.labels[idx], dtype=torch.long)
+
+class TextCNN(nn.Module):
+    def __init__(self, vocab_size, embed_dim, num_classes, num_filters, kernel_sizes):
+        super(TextCNN, self).__init__()
+        self.embedding = nn.Embedding(vocab_size, embed_dim)
+        self.convs = nn.ModuleList([
+            nn.Conv1d(embed_dim, num_filters, kernel_size) for kernel_size in kernel_sizes
+        ])
+        self.dropout = nn.Dropout(0.5)
+        self.fc = nn.Linear(num_filters * len(kernel_sizes), num_classes)
+
+    def forward(self, x):
+        x = self.embedding(x)
+        x = x.permute(0, 2, 1)
+        x = [torch.relu(conv(x)) for conv in self.convs]
+        x = [torch.max_pool1d(i, i.size(2)).squeeze(2) for i in x]
+        x = torch.cat(x, 1)
+        x = self.dropout(x)
+        x = self.fc(x)
+        return x
+
+def train_model(model, train_loader, dev_loader, criterion, optimizer, num_epochs=10, checkpoint_dir=".", device=None):
+    if device is None:
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
+
+    best_accuracy = 0.0
+    for epoch in range(num_epochs):
+        model.train()
+        total_loss = 0.0
+        progress_bar = tqdm(train_loader, desc=f"Epoch {epoch + 1}/{num_epochs}")
+        for data, labels in progress_bar:
+            data, labels = data.to(device), labels.to(device)
+            # print(f"Max index in data: {data.max().item()}, vocab_size: {vocab_size}")
+
+            optimizer.zero_grad()
+            outputs = model(data)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+
+            total_loss += loss.item() * data.size(0)
+
+        avg_loss = total_loss / len(train_loader.dataset)
+        progress_bar.set_postfix(loss=f"{avg_loss:.4f}")
+
+        model.eval()
+        correct = 0
+        total = 0
+        with torch.no_grad():
+            for data, labels in dev_loader:
+                data, labels = data.to(device), labels.to(device)
+                # print(f"Max index in data: {data.max().item()}, vocab_size: {vocab_size}")
+                outputs = model(data)
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+        accuracy = correct / total
+        print(f"Epoch {epoch + 1}/{num_epochs}, Average Loss: {avg_loss:.4f}, Validation Accuracy: {accuracy:.4f}")
+
+        if accuracy > best_accuracy:
+            best_accuracy = accuracy
+            best_model_path = os.path.join(checkpoint_dir, "best_model_sp.pth")
+            torch.save(model.state_dict(), best_model_path)
+            print(f"Best model saved to {best_model_path} with Accuracy: {best_accuracy:.4f}")
+
+    last_model_path = os.path.join(checkpoint_dir, "last_model_sp.pth")
+    torch.save(model.state_dict(), last_model_path)
+
+def evaluate_model(model, test_loader, device = None):
+    if device is None:
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
+    model.eval()
+    all_predictions = []
+    all_labels = []
+    with torch.no_grad():
+        for data, labels in test_loader:
+            data, labels = data.to(device), labels.to(device)
+            # print(f"Max index in data: {data.max().item()}, vocab_size: {vocab_size}")
+            outputs = model(data)
+            _, predicted = torch.max(outputs.data, 1)
+            all_labels.extend(labels.cpu().numpy())
+            all_predictions.extend(predicted.cpu().numpy())
+
+    report = classification_report(all_labels, all_predictions)
+    print(report)
+
+
+# spm.SentencePieceTrainer.train(input='./train.jsonl', model_prefix='sp_model', vocab_size=10000)
+
+sp = spm.SentencePieceProcessor()
+sp.load('sp_model.model')
+
+vocab, label_dict = build_vocab_and_labels('./train.jsonl', sp)
+
+texts_train, labels_train = load_data('./train.jsonl')
+texts_test, labels_test = load_data('./test.jsonl')
+texts_dev, labels_dev = load_data('./dev.jsonl')
+
+train_dataset = Text_Numericalization(texts_train, labels_train, vocab, label_dict, sp)
+test_dataset = Text_Numericalization(texts_test, labels_test, vocab, label_dict, sp)
+dev_dataset = Text_Numericalization(texts_dev, labels_dev, vocab, label_dict, sp)
+
+train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
+dev_loader = DataLoader(dev_dataset, batch_size=64, shuffle=False)
+test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False)
+
+vocab_size = len(vocab) + 2
+embed_dim = 100
+num_classes = 3
+num_filters = 100
+kernel_sizes = [3, 4, 5]
+
+model = TextCNN(vocab_size, embed_dim, num_classes, num_filters, kernel_sizes)
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+train_model(model, train_loader, dev_loader, criterion, optimizer, num_epochs=8, checkpoint_dir="./cp")
+
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# model.to(device)
+# model.load_state_dict(torch.load("./cp/last_model_sp.pth"))
+
+evaluate_model(model, test_loader)
