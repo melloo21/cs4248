@@ -1,13 +1,13 @@
 from typing import Collection
 
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 from src.schema.tokenized_data import TokenizedData
 from src.schema.vectorized_data import VectorizedData
 from src.vectorizer.abstract_vectorizer import AbstractVectorizer
 
 
-class SkCountVectorizer(AbstractVectorizer):
+class SkTfidfVectorizer(AbstractVectorizer):
     def __init__(
         self,
         ngram_range=(1, 2),
@@ -17,11 +17,11 @@ class SkCountVectorizer(AbstractVectorizer):
         analyzer: str = 'word',
     ):
         if ignore_preprocessing is True:
-            self.model = CountVectorizer(
+            self.model = TfidfVectorizer(
                 ngram_range=ngram_range, binary=binary, tokenizer=self._dummy_tokenizer,
             )
         else:
-            self.model = CountVectorizer(
+            self.model = TfidfVectorizer(
                 ngram_range=ngram_range, token_pattern=token_pattern, binary=binary,
                 analyzer=analyzer,
             )
