@@ -557,6 +557,7 @@ def read_s2_excerpt(ex):
         section_number=None,  # Not available for s2 data
         section_title=ex['sectionName'],
         intent=ex['label'],
+        cite_marker_offset=[ex['citeStart'], ex['citeEnd']],  # Not useful here
         # cite_marker_offset=offsets,  # Not useful here
         sents_before=None,  # not available for s2 data
         sents_after=None,  # not available for s2 data

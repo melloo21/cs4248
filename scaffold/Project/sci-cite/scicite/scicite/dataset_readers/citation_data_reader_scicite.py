@@ -92,13 +92,17 @@ class SciciteDatasetReader(DatasetReader):
             reader_s2 = DataReaderS2ExcerptJL(jsonl_file)
         elif self.reader_format == 'nested':
             reader_s2 = DataReaderS2(jsonl_file)
+        # print('here', [x.cite_marker_offset for x in reader_s2.read()])
+        # return
         for citation in reader_s2.read():
             yield self.text_to_instance(
                 citation_text=citation.text,
                 intent=citation.intent,
                 citing_paper_id=citation.citing_paper_id,
                 cited_paper_id=citation.cited_paper_id,
-                citation_excerpt_index=citation.citation_excerpt_index
+                citation_excerpt_index=citation.citation_excerpt_index,
+                cite_marker_begin=citation.cite_marker_offset[0],
+                cite_marker_end=citation.cite_marker_offset[1]
             )
 
     @overrides
@@ -132,9 +136,12 @@ class SciciteDatasetReader(DatasetReader):
 
         # citation_text = processed_text
         if self.convert_cite_to_token:
+            # print(cite_marker_begin, cite_marker_end)
             # print("pre: ", citation_text)
-            citation_text = re.sub("[\(\[](\D+\d{4})*?[\)\]]", "@@@CITE@@@", citation_text)
-            citation_text = re.sub("([\[\(]\d+([,-]?\s*\W*\d+)*[\]\)])", "@@@CITE@@@", citation_text)
+            # citation_text = re.sub("[\(\[](\D+\d{4})*?[\)\]]", "@@@CITE@@@", citation_text)
+            # citation_text = re.sub("([\[\(]\d+([,-]?\s*\W*\d+)*[\]\)])", "@@@CITE@@@", citation_text)
+            if not cite_marker_begin and not cite_marker_end:
+                citation_text = citation_text[:int(cite_marker_begin)] + citation_text[int(cite_marker_end):]
             # print("post: ", citation_text)
 
         citation_tokens = self._tokenizer.tokenize(citation_text)
