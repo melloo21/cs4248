@@ -106,17 +106,17 @@ local DIM =
   "iterator": {
     "type": "bucket",
     "sorting_keys": [["citation_text", "num_tokens"]],
-    "batch_size": 32
+    "batch_size": 16
   },
   "iterator_aux": {
     "type": "bucket",
     "sorting_keys": [["citation_text", "num_tokens"]],
-    "batch_size": 32
+    "batch_size": 16
   },
   "iterator_aux2": {
     "type": "bucket",
     "sorting_keys": [["citation_text", "num_tokens"]],
-    "batch_size": 32
+    "batch_size": 16
   },
   "trainer": {
     "num_epochs": 10,

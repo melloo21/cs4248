@@ -24,9 +24,12 @@ python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-ex
 python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05-elmo-forwardgru-noattention.json" -s "./runs/experiment-0.05-0.05-elmo-forwardgru-noattention" --include-package scicite
 
 
-python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05-numtokens.json" -s "./runs/experiment-0.05-0.05-numtokens" --include-package scicite
+python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05-numtokens.json" -s "./runs/experiment-0.05-0.05-numtokens2" --include-package scicite
 
 
 python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05-citetokens.json" -s "./runs/experiment-0.05-0.05-citetokens" --include-package scicite
 
 python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05-removecite.json" -s "./runs/experiment-0.05-0.05-removecite" --include-package scicite
+
+
+python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05-bertembeddings.json" -s "./runs/experiment-0.05-0.05-bertembeddings" --include-package scicite

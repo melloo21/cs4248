@@ -459,6 +459,7 @@ class MultiTaskTrainer2:
         """
         Does a forward pass on the given batch and auxiliary data batches and returns the ``loss`` value in the result.
         If ``for_training`` is `True` also applies regularization penalty.
+        Loss is not jointly optimized for each forward step. Forward pass is performed 3 times to obtain joint loss.
         """
         if self._multiple_gpu:
             output_dict = self._data_parallel(batch)
@@ -466,6 +467,7 @@ class MultiTaskTrainer2:
                 raise ConfigurationError('multi-gpu not supported for multi-task training.')
         else:
             batch = util.move_to_device(batch, self._cuda_devices[0])
+            # print("batch", batch)
             output_dict = self._model(**batch)
 
         try:
@@ -479,6 +481,8 @@ class MultiTaskTrainer2:
             loss = None
 
         if batch_aux is not None and batch_aux2 is not None:
+            # print("batch_aux", batch_aux)
+            # print("batch_aux2", batch_aux2)
             batch_aux = util.move_to_device(batch_aux, self._cuda_devices[0])
             batch_aux2 = util.move_to_device(batch_aux2, self._cuda_devices[0])
             output_dict_aux = self._model(**batch_aux)

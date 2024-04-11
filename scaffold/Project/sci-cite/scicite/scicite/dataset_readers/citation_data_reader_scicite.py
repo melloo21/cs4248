@@ -14,7 +14,7 @@ from allennlp.data.dataset_readers.dataset_reader import DatasetReader
 from allennlp.data.fields import LabelField, TextField, MultiLabelField, ListField, ArrayField, MetadataField
 from allennlp.data.instance import Instance
 from allennlp.data.tokenizers import Tokenizer, WordTokenizer
-from allennlp.data.token_indexers import TokenIndexer, SingleIdTokenIndexer, ELMoTokenCharactersIndexer
+from allennlp.data.token_indexers import TokenIndexer, SingleIdTokenIndexer, ELMoTokenCharactersIndexer, PretrainedBertIndexer
 
 from scicite.resources.lexicons import ALL_ACTION_LEXICONS, ALL_CONCEPT_LEXICONS
 from scicite.data import DataReaderJurgens
@@ -72,8 +72,16 @@ class SciciteDatasetReader(DatasetReader):
             # self._token_indexers = {"tokens": SingleIdTokenIndexer()}
             self._token_indexers = {"elmo": ELMoTokenCharactersIndexer(),
                                     "tokens": SingleIdTokenIndexer()}
+                                    
         else:
             self._token_indexers = {"tokens": SingleIdTokenIndexer()}
+        # if with_elmo:
+        #     # self._token_indexers = {"tokens": SingleIdTokenIndexer()}
+        #     self._token_indexers = {"elmo": ELMoTokenCharactersIndexer(),
+        #                             "tokens": PretrainedBertIndexer('bert-base-uncased')}
+                                    
+        # else:
+        #     self._token_indexers = {"tokens": PretrainedBertIndexer('bert-base-uncased')}
 
         self.use_lexicon_features = use_lexicon_features
         self.use_sparse_lexicon_features = use_sparse_lexicon_features
@@ -83,8 +91,8 @@ class SciciteDatasetReader(DatasetReader):
         self.reader_format = reader_format
         self.NUM_TOKEN = nlp("@@NUM@@")[0]
         self.CITE_TOKEN = nlp("@@CITE@@")[0]
-        self.convert_num = False
-        self.convert_cite_to_token = True
+        self.convert_num = True
+        self.convert_cite_to_token = False # set to true for remove cite
 
     @overrides
     def _read(self, jsonl_file: str):

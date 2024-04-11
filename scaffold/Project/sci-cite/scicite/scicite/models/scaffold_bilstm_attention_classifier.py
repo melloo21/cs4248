@@ -128,7 +128,6 @@ class ScaffoldBilstmAttentionClassifier(Model):
 
         # shape: [batch, sent, output_dim]
         encoded_citation_text = self.citation_text_encoder(citation_text_embedding, citation_text_mask)
-
         ## Default ##
         use_attention = True
         if use_attention:
@@ -184,7 +183,7 @@ class ScaffoldBilstmAttentionClassifier(Model):
         if self.predict_mode:
             logits = self.classifier_feedforward(encoded_citation_text)
             class_probs = F.softmax(logits, dim=1)
-            output_dict = {"logits": logits}
+            output_dict = {"logits": logits}            
 
         output_dict['citing_paper_id'] = citing_paper_id
         output_dict['cited_paper_id'] = cited_paper_id

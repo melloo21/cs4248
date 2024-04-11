@@ -22,7 +22,7 @@
             "bidirectional": true,
             "dropout": 0.3,
             "hidden_size": 100,
-            "input_size": 1124,
+            "input_size": 1324,
             "num_layers": 2
         },
         "classifier_feedforward": {

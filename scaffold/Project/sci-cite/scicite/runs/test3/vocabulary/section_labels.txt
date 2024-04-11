@@ -1,5 +1,0 @@
-introduction
-conclusion
-experiments
-method
-related work
