@@ -13,10 +13,10 @@ class SpacyTokenizer(AbstractTokenizer):
         merge_nouns: bool = False,
         merge_entities: bool = False,
         # replace_punctuations: bool = True,
-        remove_stopwords: bool = True,
+        remove_stopwords: bool = False,
         replace_numbers: bool = True,
         lowercase: bool = True,
-        lemmatize: bool = True,
+        lemmatize: bool = False,
     ):
         self.merge_nouns = merge_nouns
         self.merge_entities = merge_entities

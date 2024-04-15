@@ -12,7 +12,7 @@ class SkTfidfVectorizer(AbstractVectorizer):
         self,
         ngram_range=(1, 2),
         token_pattern: str = r'(?u)\b[a-zA-Z0-9\-][a-zA-Z0-9\-]+\b',
-        binary: bool = False,
+        binary: bool = True,
         ignore_preprocessing: bool = False,
         analyzer: str = 'word',
     ):
