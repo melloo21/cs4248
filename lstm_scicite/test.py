@@ -1,7 +1,3 @@
-# 10
-# 10
-# 10
-
 from dataloader import *
 from lstm import *
 from sklearn.metrics import f1_score
@@ -15,7 +11,7 @@ test_loader = DataLoader(dataset=test_data,
                          collate_fn=collate_fn)
 
 # Initialize LSTM model
-model = LSTMModel(input_size=embedding_dim, hidden_size=hidden_size, num_layers=num_layers, num_classes=num_classes).to(device)
+model = LSTMWithSelfAttention(vocab_size=vocab_size, embedding_dim=embedding_dim, hidden_size=hidden_size, num_layers=num_layers, num_classes=num_classes).to(device)
 model.load_state_dict(torch.load("checkpoint/best.pth"))
 
 # Test the model
