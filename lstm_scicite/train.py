@@ -2,17 +2,14 @@ from dataloader import *
 from lstm import *
 import os
 from torch.optim import lr_scheduler
-
+from sklearn.metrics import f1_score
+from transformers import BertModel
 
 
 
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-# Initialize LSTM model
-# model = LSTMModel(input_size=embedding_dim, hidden_size=hidden_size, num_layers=num_layers, num_classes=num_classes).to(device)
-# model = BiLSTMModel(input_size=embedding_dim, hidden_size=hidden_size, num_layers=num_layers, num_classes=num_classes).to(device)
-model = LSTMWithSelfAttention(input_size=embedding_dim, hidden_size=hidden_size, num_layers=num_layers, num_classes=num_classes).to(device)
+model = LSTMWithSelfAttention(vocab_size=vocab_size, embedding_dim=embedding_dim, hidden_size=hidden_size, num_layers=num_layers, num_classes=num_classes).to(device)
 
 
 # Loss and optimizer
@@ -68,6 +65,9 @@ for epoch in range(num_epochs):
     model.eval()
     correct = 0
     total = 0
+
+    dev_labels = []
+    dev_predictions = []
     with torch.no_grad():
         for batch in dev_loader:
             inputs, labels = batch
@@ -78,8 +78,13 @@ for epoch in range(num_epochs):
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
+            dev_labels.extend(labels.cpu().numpy())
+            dev_predictions.extend(predicted.cpu().numpy())
+
     accuracy = correct / total
-    print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {total_loss / len(train_loader):.4f}, Validation Accuracy: {accuracy:.4f}')
+    f1 = f1_score(dev_labels, dev_predictions, average='macro')
+
+    print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {total_loss / len(train_loader):.4f}, Validation Accuracy: {accuracy:.4f}, Validation macro-f1: {f1:.4f}')
 
     # Save best model
     if accuracy > best_accuracy:
