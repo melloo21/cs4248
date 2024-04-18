@@ -96,10 +96,9 @@ If you are using your own data, you need to first convert your data to be accord
 
 #### Pretrained models
 
-We also release our pretrained models; download from the following path:
+Pretrained models from the original paper; download from the following path:
 
 * __[`SciCite`](https://s3-us-west-2.amazonaws.com/ai2-s2-research/scicite/models/scicite.tar.gz)__
-* __[`ACL-ARC`](https://s3-us-west-2.amazonaws.com/ai2-s2-research/scicite/models/aclarc.tar.gz)__
 
 ## Training your own models
 
