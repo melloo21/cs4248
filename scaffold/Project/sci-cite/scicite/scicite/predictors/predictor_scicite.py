@@ -40,7 +40,6 @@ class PredictorSciCite(Predictor):
                 citation_excerpt_index=citation.citation_excerpt_index
             )
             outputs = self._model.forward_on_instance(instance)
-            
             return_dict['citingPaperId'] = outputs.get('citing_paper_id')
             return_dict['citedPaperId'] = outputs.get('cited_paper_id')
             return_dict['citation_id'] = citation.citation_id
@@ -59,7 +58,7 @@ class PredictorSciCite(Predictor):
         If you don't want your outputs in JSON-lines format
         you can override this function to output them differently.
         """
-        keys = ['citedPaperId', 'citingPaperId', 'excerptCitationIntents', 'prediction', 'unique_id', 'label']
+        keys = ['citedPaperId', 'citingPaperId', 'excerptCitationIntents', 'prediction', 'unique_id', 'label', 'attention_dist', 'citation_text']
         for k in outputs.copy():
             if k not in keys:
                 outputs.pop(k)

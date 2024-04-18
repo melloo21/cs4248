@@ -133,7 +133,7 @@ class ScaffoldBilstmAttentionClassifier(Model):
         if use_attention:
             # shape: [batch, output_dim]
             attn_dist, encoded_citation_text = self.attention_seq2seq(encoded_citation_text, return_attn_distribution=True)
-
+            # print(attn_dist)
         else:
         ## Unidirectional without attention ## 
 
@@ -323,11 +323,18 @@ class Attention(nn.Module):
         In two steps we convert [batch, sent_len, num_words_in_category, num_categories] into [batch, num_categories]
         """
         # calculate attn weights
+        # print("self.attention .shape ", self.attention.shape)
+        # print("x_in.shape ", x_in.shape)
+        # print("torch.matmul(x_in, self.attention).shape ", torch.matmul(x_in, self.attention).shape)
         attn_score = torch.matmul(x_in, self.attention).squeeze()
+        # print("attn_score.shape ", attn_score.shape)
         # add one dimension at the end and get a distribution out of scores
         attn_distrib = F.softmax(attn_score.squeeze(), dim=-1).unsqueeze(-1)
+        # print("attn_distrib.shape ", attn_distrib.shape)
         scored_x = x_in * attn_distrib
+        # print("scored_x.shape ", scored_x.shape)
         weighted_sum = torch.sum(scored_x, dim=reduction_dim)
+        # print("weighted_sum.shape ", weighted_sum.shape)
         if return_attn_distribution:
             return attn_distrib.reshape(x_in.shape[0], -1), weighted_sum
         else:

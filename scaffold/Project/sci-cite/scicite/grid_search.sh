@@ -33,3 +33,7 @@ python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-ex
 
 
 python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05-bertembeddings.json" -s "./runs/experiment-0.05-0.05-bertembeddings" --include-package scicite
+
+python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05-removestop.json" -s "./runs/experiment-0.05-0.05-removestop" --include-package scicite
+
+python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05-deduplicate.json" -s "./runs/experiment-0.05-0.05-deduplicate" --include-package scicite

@@ -91,8 +91,9 @@ class SciciteDatasetReader(DatasetReader):
         self.reader_format = reader_format
         self.NUM_TOKEN = nlp("@@NUM@@")[0]
         self.CITE_TOKEN = nlp("@@CITE@@")[0]
-        self.convert_num = True
+        self.convert_num = False # set to true to convert numbers to tokens
         self.convert_cite_to_token = False # set to true for remove cite
+        self.remove_stopwords = False # set to true to remove stopwords
 
     @overrides
     def _read(self, jsonl_file: str):
@@ -155,6 +156,9 @@ class SciciteDatasetReader(DatasetReader):
         citation_tokens = self._tokenizer.tokenize(citation_text)
         if self.convert_num:
             citation_tokens = [self.NUM_TOKEN if x.like_num else x for x in citation_tokens]
+        if self.remove_stopwords:
+            citation_tokens = [x for x in citation_tokens if not x.is_stop]
+
 
 
         fields = {

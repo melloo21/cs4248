@@ -1,38 +1,68 @@
-# <p align=center>`SciCite`</p> 
+# <p align=center>`Citation Intent Classification`</p> 
 
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/structural-scaffolds-for-citation-intent/citation-intent-classification-acl-arc)](https://paperswithcode.com/sota/citation-intent-classification-acl-arc?p=structural-scaffolds-for-citation-intent) [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/structural-scaffolds-for-citation-intent/sentence-classification-acl-arc)](https://paperswithcode.com/sota/sentence-classification-acl-arc?p=structural-scaffolds-for-citation-intent) [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/structural-scaffolds-for-citation-intent/citation-intent-classification-scicite)](https://paperswithcode.com/sota/citation-intent-classification-scicite?p=structural-scaffolds-for-citation-intent)
+This repository contains datasets and code for running experiments on the Scicite model architecture as well as data for the purpose of classifying citation intents. 
 
-This repository contains datasets and code for classifying citation intents in academic papers.  
-For details on the model and data refer to our NAACL 2019 paper:
+The original code was obtained from the paper: 
 ["Structural Scaffolds for Citation Intent Classification in Scientific Publications"](https://arxiv.org/pdf/1904.01608.pdf).
 
-## Data
+## Experiments
 
-We introduce `SciCite` a new large dataset of citation intents. Download from the following link:
+The experiments can be replicated by running the following code:
 
-[`scicite.tar.gz (22.1 MB)`](https://s3-us-west-2.amazonaws.com/ai2-s2-research/scicite/scicite.tar.gz)  
+Hyperparameter search for $\lambda_1$ and $\lambda_2$
 
+`cd scaffold/Project/sci-cite/scicite/`
 
-The data is in the Jsonlines format (each line is a json object).   
-The main citation intent label for each Json object is spacified with the `label` key while the citation context is specified in with a `context` key.
-Example entry:
+`python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.1-0.1.json" -s "./experiments-_0.1_0.1" --include-package scicite
+`
 
-```
-{
- 'string': 'In chacma baboons, male-infant relationships can be linked to both
-    formation of friendships and paternity success [30,31].'
- 'sectionName': 'Introduction',
- 'label': 'background',
- 'citingPaperId': '7a6b2d4b405439',
- 'citedPaperId': '9d1abadc55b5e0',
- ...
- }
-```
+Change mixing_ratio for $\lambda_1$ and mixing ratio for $\lambda_2$ in json file.
 
-You may obtain the full information about the paper using the provided paper ids with the [Semantic Scholar API](https://api.semanticscholar.org/).
+Experiment 1: Baseline
 
-We also run experiments on a pre-existing dataset of citation intents in the computational linguistics domain (ACL-ARC) introduced by [Jurgens et al., (2018)](https://transacl.org/ojs/index.php/tacl/article/view/1266).
-The preprocessed dataset is available at [`ACL-ARC data`](https://s3-us-west-2.amazonaws.com/ai2-s2-research/scicite/acl-arc.tar.gz).
+`python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05.json" -s ".runs/experiments-_0.05-0.05" --include-package scicite
+`
+
+Experiment 2: Convert numbers to tokens
+
+`python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05.json" -s ".runs/experiments-_0.05-0.05" --include-package scicite
+`
+
+In `scaffold/Project/sci-cite/scicite/scicite/dataset_readers/citation_data_reader_scicite.py `, change self.convert_num = True
+
+Experiment 3: Remove citations using citestart/end
+
+`python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05.json" -s "./experiments-_0.05-0.05" --include-package scicite
+`
+In `scaffold/Project/sci-cite/scicite/scicite/dataset_readers/citation_data_reader_scicite.py `, change self.convert_cite_to_token = True
+
+Experiment 4: Using Word2Vec + ELMO
+
+`python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05-w2v.json" -s "./runs/experiment-0.05-0.05-w2v-1" --include-package scicite
+`
+
+Experiment 5: Using LSTM instead of GRU 
+
+`python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05-elmo-lstm.json" -s "./runs/experiment-0.05-0.05-elmo-lstm" --include-package scicite`
+
+Experiment 6: Removing Bi-directionality
+
+`python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05-elmo-forwardgru.json" -s "./runs/experiment-0.05-0.05-elmo-forwardgru" --include-package scicite
+`
+Experiment 7: Removing ELMo
+
+`python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05-no-elmo.json" -s "./runs/experiment-0.05-0.05-no-elmo" --include-package scicite
+`
+
+Experiment 8: Using deduplication 
+
+`python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05-deduplicate.json" -s "./runs/experiment-0.05-0.05-deduplicate" --include-package scicite
+`
+
+Experiment 9: Remove Stopwords
+`python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05-removestop.json" -s "./runs/experiment-0.05-0.05-removestop" --include-package scicite`
+
+In `scaffold/Project/sci-cite/scicite/scicite/dataset_readers/citation_data_reader_scicite.py `, change self.remove_stopwords = True
 
 ## Setup
 
@@ -87,15 +117,6 @@ Important options (you can specify them with environment variables) are:
   "mixing_ratio2": # parameter \lambda_3 in the paper (sensitivity of loss to the second scaffold)
 ``` 
 
-After downloading the data, edit the configuration file with the correct paths.
-You also need to pass in an environment variable specifying whether to use [ELMo](https://allennlp.org/elmo) contextualized embeddings.
-
-`export elmo=true`
-
-Note that with elmo training speed will be significantly slower.
-
-After making sure you have the correct configuration file, start training the model.
-
 ```
 python scripts/train_local.py train_multitask_2 [path-to-config-file.json] \
 -s [path-to-serialization-dir/] 
@@ -104,15 +125,4 @@ python scripts/train_local.py train_multitask_2 [path-to-config-file.json] \
 
 Where the model output and logs will be stored in `[path-to-serialization-dir/]`
 
-## Citing
 
-If you found our dataset, or code useful, please cite [Structural Scaffolds for Citation Intent Classification in Scientific Publications](https://arxiv.org/pdf/1904.01608.pdf).
-
-```
-@InProceedings{Cohan2019Structural,
-  author={Arman Cohan and Waleed Ammar and Madeleine Van Zuylen and Field Cady},
-  title={Structural Scaffolds for Citation Intent Classification in Scientific Publications},
-  booktitle="NAACL",
-  year="2019"
-}
-```
