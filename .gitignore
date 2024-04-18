@@ -1,1 +1,11 @@
-model/
+# scaffold - kh
+*.th
+*.tar.gz
+*.pyc
+*/__pycache__/*
+*.log
+*.weight_file
+*.jsonl
+*/.ipynb_checkpoints/*
+scaffold/Project/sci-cite/scicite/pretrained_weights
+*.bin
