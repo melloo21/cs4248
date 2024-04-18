@@ -49,6 +49,7 @@ Experiment 6: Removing Bi-directionality
 
 `python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05-elmo-forwardgru.json" -s "./runs/experiment-0.05-0.05-elmo-forwardgru" --include-package scicite
 `
+
 Experiment 7: Removing ELMo
 
 `python scripts/train_local.py train_multitask_2 "./experiment_configs/scicite-experiment-0.05-0.05-no-elmo.json" -s "./runs/experiment-0.05-0.05-no-elmo" --include-package scicite
