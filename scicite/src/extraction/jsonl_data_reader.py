@@ -13,9 +13,14 @@ class JsonlDataReader:
         else:
             self._path = file_path or PathGetter.get_data_directory() / 'dev.jsonl'
 
-    def read(self) -> Documents:
+    def read_jsonl(self) -> list[dict]:
         with open(self._path, 'r', encoding='utf8') as f:
             data = [json.loads(file_line) for file_line in f]
+        return data
+
+    def read(self) -> Documents:
+        data = self.read_jsonl()
+
         raw_instances = [
             DataInstance(
                 row['string'], row['label'], row['id'], row['citeStart'], row['citeEnd']

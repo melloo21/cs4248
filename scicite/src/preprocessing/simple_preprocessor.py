@@ -1,13 +1,15 @@
 import pandas as pd
 
 from src.preprocessing.abstract_preprocessor import AbstractPreprocessor
+from src.preprocessing.train_duplicate_remover import TrainDuplicateRemover
 from src.schema.data_instance import DataInstance
 from src.schema.documents import Documents
 
 
 class SimplePreprocessor(AbstractPreprocessor):
-    def __init__(self, remove_citations: bool = True):
+    def __init__(self, remove_citations: bool = True, remove_duplicates: bool = True):
         self._remove_citations = remove_citations
+        self._remove_duplicates = remove_duplicates
 
     @staticmethod
     def remove_citations(data_instance: DataInstance) -> DataInstance:
@@ -26,9 +28,13 @@ class SimplePreprocessor(AbstractPreprocessor):
         )
 
     def preprocess(self, document: Documents) -> Documents:
-        preprocessed_instances = document
+        preprocessed_instances = document.raw_instances
         if self._remove_citations:
             preprocessed_instances = list(
-                map(self.remove_citations, document.raw_instances)
+                map(self.remove_citations, preprocessed_instances)
+            )
+        if self._remove_duplicates:
+            preprocessed_instances = TrainDuplicateRemover().remove_if_train(
+                preprocessed_instances
             )
         return Documents.from_data_instance(preprocessed_instances)
