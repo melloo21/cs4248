@@ -1,6 +1,6 @@
 # Code repository
 
-Classical models: [main/scicite/src](https://github.com/melloo21/cs4248/tree/main/scicite/src)
+Classical models: [https://github.com/melloo21/cs4248/tree/main/scicite/src](https://github.com/melloo21/cs4248/blob/mq-develop/notebooks/classical_model.ipynb)
 
 Classical NN/CNN: [tree/hsy](https://github.com/melloo21/cs4248/tree/hsy)
 
